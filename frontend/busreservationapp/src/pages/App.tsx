@@ -8,15 +8,14 @@ import ClosedTickets from './ClosedTickets'
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-gray-50">  
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <TopBar />
-        <main className="flex-1 w-full"> 
+        <main className="flex-1 w-full">
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
-           <Route path="/reservation" element={<Reservation/>} />
-            <Route path="/tickets/open" element={<OpenTickets/>} />
-            <Route path="/tickets/closed" element={<ClosedTickets/>} />
-            <Route path="/admin/reset" element={<h1>AdminReset</h1>} />
+            <Route path="/reservation" element={<Reservation />} />
+            <Route path="/tickets/open" element={<OpenTickets />} />
+            <Route path="/tickets/closed" element={<ClosedTickets />} />
             <Route path="/" element={<Dashboard />} />
           </Routes>
         </main>
