@@ -62,7 +62,11 @@ export default function Dashboard() {
       const res = await axios.get<{ data: Passenger[]; counts: TicketCounts }>(
         `${BASE_URL}/api/tickets/status/alltickets`
       )
-      setPassengers(res.data.data)
+      const sortedPassengers = [...res.data.data].sort(
+      (a, b) => a.seatNumber - b.seatNumber
+    )
+
+    setPassengers(sortedPassengers)
       setTicketsCounts(res.data.counts)
     } catch (error) {
       console.error('Failed to fetch passengers:', error)

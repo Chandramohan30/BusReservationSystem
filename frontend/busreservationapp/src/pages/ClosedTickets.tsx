@@ -23,7 +23,13 @@ export default function ClosedTickets() {
   const fetchClosedTickets = async (): Promise<void> => {
     try {
       const res = await axios.get<{ data: Ticket[] }>(`${BASE_URL}/api/tickets/status/closed`)
-      setTickets(res.data.data)
+
+      const sortedTickets = [...res.data.data].sort(
+        (a, b) => a.seatNumber - b.seatNumber
+      )
+
+      
+      setTickets(sortedTickets)
     } catch (error) {
       console.error('Failed to fetch Closed tickets:', error)
     } finally {

@@ -24,7 +24,11 @@ export default function OpenTickets() {
   const fetchOpenTickets = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/tickets/status/open`)
-      setTickets(res.data.data as Ticket[])
+      const sortedTickets = [...res.data.data].sort(
+        (a, b) => a.seatNumber - b.seatNumber
+      )
+
+      setTickets(sortedTickets as Ticket[])
     } catch (error) {
       console.error('Failed to fetch open tickets:', error)
     } finally {
