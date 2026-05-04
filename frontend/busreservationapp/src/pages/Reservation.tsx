@@ -4,24 +4,49 @@ import axios from 'axios'
 import config from '../config/config';
 const { BASE_URL } = config;
 
-export default function Reservation() {
-  const [tickets, setTickets] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [selectedSeat, setSelectedSeat] = useState(null)
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '' })
-  const [submitting, setSubmitting] = useState(false)
-  const [toast, setToast] = useState(null)
 
-  const showToast = (message, type = 'success') => {
+
+interface Ticket {
+  _id: string
+  seatNumber: number
+  status: 'open' | 'closed'
+  firstName?: string
+  lastName?: string
+  email?: string
+  bookedAt?: string
+}
+
+interface BookingForm {
+  firstName: string
+  lastName: string
+  email: string
+}
+
+interface Toast {
+  message: string
+  type: 'success' | 'error'
+}
+
+
+
+export default function Reservation() {
+  const [tickets, setTickets] = useState<Ticket[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [selectedSeat, setSelectedSeat] = useState<Ticket | null>(null)
+  const [form, setForm] = useState<BookingForm>({ firstName: '', lastName: '', email: '' })
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [toast, setToast] = useState<Toast | null>(null)
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000)
   }
 
   const fetchTickets = async () => {
     try {
-      const openRes = await axios.get(`${BASE_URL}/tickets/status/open`)
-      const closedRes = await axios.get(`${BASE_URL}/tickets/status/closed`)
-      const all = [...openRes.data.data, ...closedRes.data.data]
+      const openRes = await axios.get(`${BASE_URL}/api/tickets/status/open`)
+      const closedRes = await axios.get(`${BASE_URL}/api/tickets/status/closed`)
+      const all: Ticket[] = [...openRes.data.data, ...closedRes.data.data]
       all.sort((a, b) => a.seatNumber - b.seatNumber)
       setTickets(all)
     } catch (error) {
@@ -33,7 +58,7 @@ export default function Reservation() {
 
   useEffect(() => { fetchTickets() }, [])
 
-  const handleSeatClick = (ticket) => {
+  const handleSeatClick = (ticket: Ticket) => {
     if (ticket.status === 'closed') return
     setSelectedSeat(ticket)
     setForm({ firstName: '', lastName: '', email: '' })
@@ -44,9 +69,11 @@ export default function Reservation() {
       showToast('Please fill all fields', 'error')
       return
     }
+    if (!selectedSeat) return
+
     setSubmitting(true)
     try {
-      await axios.put(`${BASE_URL}/tickets/${selectedSeat._id}/updateticketdetails`, {
+      await axios.put(`${BASE_URL}/api/tickets/${selectedSeat._id}/updateticketdetails`, {
         status: 'closed',
         firstName: form.firstName,
         lastName: form.lastName,
@@ -68,14 +95,15 @@ export default function Reservation() {
   const openCount = tickets.filter(t => t.status === 'open').length
   const closedCount = tickets.filter(t => t.status === 'closed').length
 
-  const chunkRows = (seats) => {
-    const rows = []
+  const chunkRows = (seats: Ticket[]): Ticket[][] => {
+    const rows: Ticket[][] = []
     for (let i = 0; i < seats.length; i += 5) rows.push(seats.slice(i, i + 5))
     return rows
   }
 
 
-  const SeatBox = ({ ticket }) => {
+
+  const SeatBox = ({ ticket }: { ticket: Ticket }) => {
     const isBooked = ticket.status === 'closed'
 
     return (
@@ -84,9 +112,7 @@ export default function Reservation() {
         disabled={isBooked}
         title={`Seat ${ticket.seatNumber} - ${isBooked ? 'Booked' : 'Available'}`}
         className={[
-
           'relative w-[88px] h-11 rounded-md p-0 border-none overflow-hidden bg-transparent transition-transform duration-100 flex-shrink-0',
-
           'hover:enabled:-translate-y-px hover:enabled:brightness-95 active:enabled:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-85',
         ].join(' ')}
       >
@@ -119,7 +145,6 @@ export default function Reservation() {
 
           {/* Mattress */}
           <div className="flex-1 relative flex items-center justify-center">
-            {/* Stitching border */}
             <div
               className={[
                 'absolute inset-[6px] rounded-sm border border-dashed',
@@ -149,31 +174,16 @@ export default function Reservation() {
 
         {/* Booked checkmark badge */}
         {isBooked && (
-          <svg
-            className="absolute top-1 right-[5px] w-3 h-3 z-10"
-            viewBox="0 0 12 12"
-            fill="none"
-          >
-            <circle
-              cx="6" cy="6" r="5.5"
-              fill="rgba(220,38,38,0.15)"
-              stroke="#fca5a5"
-              strokeWidth="0.5"
-            />
-            <path
-              d="M3.5 6l1.8 1.8L8.5 4"
-              stroke="#f43f5e"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+          <svg className="absolute top-1 right-[5px] w-3 h-3 z-10" viewBox="0 0 12 12" fill="none">
+            <circle cx="6" cy="6" r="5.5" fill="rgba(220,38,38,0.15)" stroke="#fca5a5" strokeWidth="0.5" />
+            <path d="M3.5 6l1.8 1.8L8.5 4" stroke="#f43f5e" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </button>
     )
   }
 
-  const DeckLayout = ({ seats, label }) => {
+  const DeckLayout = ({ seats, label }: { seats: Ticket[]; label: string }) => {
     const rows = chunkRows(seats)
     return (
       <div className="bg-white border border-gray-200 rounded-xl mb-5 overflow-hidden">
@@ -208,6 +218,7 @@ export default function Reservation() {
       </div>
     )
   }
+
 
 
   if (loading) {

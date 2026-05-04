@@ -1,17 +1,30 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
-import config from '../config/config';   
+import config from '../config/config';
 const { BASE_URL } = config;
 
+
+
+interface Ticket {
+  _id: string
+  seatNumber: number
+  status: 'open' | 'closed'
+  firstName?: string
+  lastName?: string
+  email?: string
+  bookedAt?: string
+}
+
+
 export default function OpenTickets() {
-  const [tickets, setTickets] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [tickets, setTickets] = useState<Ticket[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   const fetchOpenTickets = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/tickets/status/open`)
-      setTickets(res.data.data)
+      const res = await axios.get(`${BASE_URL}/api/tickets/status/open`)
+      setTickets(res.data.data as Ticket[])
     } catch (error) {
       console.error('Failed to fetch open tickets:', error)
     } finally {
@@ -67,7 +80,7 @@ export default function OpenTickets() {
             </p>
           </div>
 
-          <table  className="w-full text-sm border border-black-200">
+          <table className="w-full text-sm border border-black-200">
             <thead className="bg-gray-50 border-b border-black-100">
               <tr>
                 <th className="text-left px-5 py-3 text-xs text-black-400 uppercase tracking-wider font-medium border-r border-black-200">Seat No.</th>
@@ -78,8 +91,8 @@ export default function OpenTickets() {
                 <th className="text-left px-5 py-3 text-xs text-black-400 uppercase tracking-wider font-medium border-r border-black-200">Booked At</th>
               </tr>
             </thead>
-           <tbody className="divide-y divide-black-300">
-              {tickets.map((ticket) => (
+            <tbody className="divide-y divide-black-300">
+              {tickets.map((ticket: Ticket) => (
                 <tr key={ticket._id} className="hover:bg-gray-50 transition-colors">
 
                   {/* Seat Number */}

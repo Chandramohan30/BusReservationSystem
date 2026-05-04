@@ -1,15 +1,28 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import config from '../config/config';   
+import config from '../config/config';
 const { BASE_URL } = config;
 
-export default function ClosedTickets() {
-  const [tickets, setTickets] = useState([])
-  const [loading, setLoading] = useState(true)
 
-  const fetchClosedTickets = async () => {
+interface Ticket {
+  _id: string
+  seatNumber: number
+  status: 'open' | 'closed'
+  firstName: string
+  lastName: string
+  email: string
+  bookedAt: string
+}
+
+
+
+export default function ClosedTickets() {
+  const [tickets, setTickets] = useState<Ticket[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
+  const fetchClosedTickets = async (): Promise<void> => {
     try {
-      const res = await axios.get(`${BASE_URL}/tickets/status/closed`)
+      const res = await axios.get<{ data: Ticket[] }>(`${BASE_URL}/api/tickets/status/closed`)
       setTickets(res.data.data)
     } catch (error) {
       console.error('Failed to fetch Closed tickets:', error)
@@ -47,7 +60,8 @@ export default function ClosedTickets() {
         <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
           <p className="text-gray-500 text-sm font-medium">No Closed tickets available</p>
@@ -78,7 +92,7 @@ export default function ClosedTickets() {
               </tr>
             </thead>
             <tbody className="divide-y divide-black-300">
-              {tickets.map((ticket) => (
+              {tickets.map((ticket: Ticket) => (
                 <tr key={ticket._id} className="hover:bg-gray-50 transition-colors">
 
                   {/* Seat Number */}
@@ -108,16 +122,16 @@ export default function ClosedTickets() {
 
                   {/* Passenger */}
                   <td className="px-5 py-3.5 text-black-400 border-r border-black-100 text-xs">
-                    {ticket.firstName+" "+ticket.lastName}
+                    {ticket.firstName + ' ' + ticket.lastName}
                   </td>
 
                   {/* Email */}
-                  <td className="px-5 py-3.5 text-black-400  border-r border-black-100 text-xs ">
+                  <td className="px-5 py-3.5 text-black-400 border-r border-black-100 text-xs">
                     {ticket.email}
                   </td>
 
                   {/* Booked At */}
-                   <td className="px-5 py-3.5 border-r border-black-100">
+                  <td className="px-5 py-3.5 border-r border-black-100">
                     <div>
                       <p className="text-black-700 text-xs">
                         {new Date(ticket.bookedAt).toLocaleString('en-IN', {
@@ -127,12 +141,12 @@ export default function ClosedTickets() {
                           year: 'numeric',
                         })}
                       </p>
-                      <p className="text-gray-400  text-xs">
+                      <p className="text-gray-400 text-xs">
                         {new Date(ticket.bookedAt).toLocaleString('en-IN', {
                           timeZone: 'Asia/Kolkata',
                           hour: '2-digit',
                           minute: '2-digit',
-                          hour12: true
+                          hour12: true,
                         })}
                       </p>
                     </div>

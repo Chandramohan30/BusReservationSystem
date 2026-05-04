@@ -25,10 +25,10 @@ export default function TopBar() {
 
     try {
 
-      const configRes = await axios.get(`${BASE_URL}/tickets/admin/config`);
+      const configRes = await axios.get(`${BASE_URL}/api/tickets/admin/config`);
       const adminKey = configRes.data.adminKey;
 
-      await axios.post(`${BASE_URL}/tickets/admin/resetalltickets`, {}, {
+      await axios.post(`${BASE_URL}/api/tickets/admin/resetalltickets`, {}, {
         headers: {
           'x-admin-key': adminKey
         }

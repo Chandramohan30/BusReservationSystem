@@ -10,8 +10,13 @@ dotenv.config({path:path.join(__dirname,'config','config.env')})
 
 //import the routers
 const ticketrouter =require('./routes/ticket');
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
+
 app.use('/api/tickets',ticketrouter)
 
 
